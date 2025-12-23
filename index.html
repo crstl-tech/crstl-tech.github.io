@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Music Player PWA</title>
+<link rel="manifest" href="manifest.json">
+<style>
+body { font-family: Arial; background: #121212; color: #fff; margin:0; padding:0;}
+header { padding: 20px; text-align: center; font-size:2em; background:#1f1f1f;}
+.albums { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; padding:20px;}
+.album { background:#1f1f1f; border-radius:10px; overflow:hidden; text-align:center; padding:10px;}
+.album img { width:100%; border-radius:10px;}
+.album h3 { margin:10px 0 5px 0;}
+.album p { margin:0 0 10px 0; font-size:0.9em; color:#bbb;}
+.tracks { text-align:left; margin-top:10px;}
+.track { padding:5px; cursor:pointer; border-bottom:1px solid #333;}
+.track:hover { background:#333;}
+.player { position:fixed; bottom:0; width:100%; background:#1f1f1f; padding:10px; display:flex; align-items:center; justify-content:space-between;}
+.player button { background:#4fc3f7; border:none; color:#111; font-weight:bold; padding:5px 10px; border-radius:5px; cursor:pointer;}
+</style>
+</head>
+<body>
+<header>🎵 My Music Player</header>
+<div class="albums" id="albums">Загрузка...</div>
+
+<div class="player" id="player" style="display:none;">
+    <div id="player-info">---</div>
+    <div>
+        <button id="prev">⏮</button>
+        <button id="play">▶</button>
+        <button id="next">⏭</button>
+    </div>
+    <audio id="audio" preload="none"></audio>
+</div>
+
+<script>
+if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').then(()=>console.log('Service worker registered'));
+}
+
+let albumsData = {};
+let currentAlbum = null;
+let currentTrackIndex = 0;
+
+const albumsContainer = document.getElementById('albums');
+const player = document.getElementById('player');
+const audio = document.getElementById('audio');
+const playerInfo = document.getElementById('player-info');
+const playBtn = document.getElementById('play');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+
+fetch('music.json')
+.then(res => res.json())
+.then(tracks => {
+    tracks.forEach(t => {
+        if(!albumsData[t.album]){
+            albumsData[t.album] = {cover:t.cover, tracks:[]};
+        }
+        albumsData[t.album].tracks.push({title:t.title, artist:t.artist, url:t.url});
+    });
+    renderAlbums();
+})
+.catch(err => {
+    albumsContainer.textContent = "Ошибка загрузки музыки";
+    console.error(err);
+});
+
+function renderAlbums(){
+    albumsContainer.innerHTML = '';
+    for(let albumName in albumsData){
+        const album = albumsData[albumName];
+        const div = document.createElement('div');
+        div.className = 'album';
+        div.innerHTML = `
+            <img src="${album.cover || 'https://via.placeholder.com/200?text=No+Cover'}">
+            <h3>${albumName}</h3>
+            <p>${album.tracks[0].artist}</p>
+            <div class="tracks">
+                ${album.tracks.map((t,i)=>`<div class="track" data-album="${albumName}" data-index="${i}">${t.title}</div>`).join('')}
+            </div>
+        `;
+        albumsContainer.appendChild(div);
+    }
+
+    document.querySelectorAll('.track').forEach(track=>{
+        track.addEventListener('click',()=>{
+            currentAlbum = track.dataset.album;
+            currentTrackIndex = parseInt(track.dataset.index);
+            playTrack();
+        });
+    });
+}
+
+function playTrack(){
+    if(!currentAlbum) return;
+    const track = albumsData[currentAlbum].tracks[currentTrackIndex];
+    audio.src = track.url;
+    audio.play();
+    playerInfo.textContent = `${track.artist} - ${track.title}`;
+    player.style.display = 'flex';
+    playBtn.textContent = "⏸";
+}
+
+playBtn.addEventListener('click', ()=>{
+    if(audio.paused){ audio.play(); playBtn.textContent="⏸"; }
+    else{ audio.pause(); playBtn.textContent="▶"; }
+});
+
+prevBtn.addEventListener('click', ()=>{
+    if(!currentAlbum) return;
+    currentTrackIndex = (currentTrackIndex - 1 + albumsData[currentAlbum].tracks.length) % albumsData[currentAlbum].tracks.length;
+    playTrack();
+});
+
+nextBtn.addEventListener('click', ()=>{
+    if(!currentAlbum) return;
+    currentTrackIndex = (currentTrackIndex + 1) % albumsData[currentAlbum].tracks.length;
+    playTrack();
+});
+</script>
+</body>
+</html>
