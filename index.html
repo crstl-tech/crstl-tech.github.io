@@ -2,11 +2,10 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8" />
-<title>Music Player PWA</title>
-<link rel="manifest" href="manifest.json">
+<title>Music Player</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-body { font-family: Arial, sans-serif; background:#121212; color:#fff; margin:0; padding:0; }
+body { font-family: Arial, sans-serif; background:#121212; color:#fff; margin:0; padding:0; padding-bottom:90px; /* место для плеера */ }
 header { padding:20px; text-align:center; font-size:1.6rem; background:#1f1f1f; }
 .albums { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; padding:16px; }
 .album { background:#1f1f1f; border-radius:10px; overflow:hidden; text-align:center; padding:10px; }
@@ -16,7 +15,7 @@ header { padding:20px; text-align:center; font-size:1.6rem; background:#1f1f1f; 
 .tracks { text-align:left; margin-top:8px; max-height:180px; overflow:auto; }
 .track { padding:8px; cursor:pointer; border-bottom:1px solid #2a2a2a; }
 .track:hover { background:#222; }
-.player { position:fixed; bottom:0; left:0; right:0; display:flex; flex-direction:column; gap:4px; padding:10px; background:#141414; border-top:1px solid #2b2b2b; }
+.player { position:fixed; bottom:0; left:0; right:0; display:flex; flex-direction:column; gap:4px; padding:10px; background:#141414; border-top:1px solid #2b2b2b; z-index:999; }
 .controls { display:flex; gap:8px; align-items:center; }
 .btn { background:#4fc3f7; border:none; color:#111; padding:6px 10px; border-radius:6px; cursor:pointer; font-weight:600; }
 .info { flex:1; padding-left:12px; font-size:0.95rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -48,12 +47,6 @@ audio { display:none; }
 </div>
 
 <script>
-// Сервис-воркер
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').then(()=>console.log('Service worker registered'))
-  .catch(e=>console.warn('SW register failed:',e));
-}
-
 let albumsData = {};
 let currentAlbum = null;
 let currentTrackIndex = 0;
@@ -70,12 +63,9 @@ const timeDisplay = document.getElementById('time');
 
 // Загружаем music.json
 fetch('music.json')
-.then(res => {
-  if(!res.ok) throw new Error('music.json not found ('+res.status+')');
-  return res.json();
-})
-.then(tracks=>{
-  if(!Array.isArray(tracks) || tracks.length===0){
+.then(res => res.ok ? res.json() : Promise.reject('music.json не найден'))
+.then(tracks => {
+  if(!Array.isArray(tracks) || !tracks.length){
     albumsContainer.innerHTML='<div class="msg">music.json пуст или неверный формат.</div>';
     return;
   }
@@ -88,13 +78,13 @@ fetch('music.json')
 })
 .catch(err=>{
   console.error(err);
-  albumsContainer.innerHTML='<div class="msg">Не удалось загрузить music.json — проверьте файл и пути.</div>';
+  albumsContainer.innerHTML='<div class="msg">Не удалось загрузить music.json.</div>';
 });
 
 function renderAlbums(){
   albumsContainer.innerHTML='';
   for(const albumName of Object.keys(albumsData)){
-    const album = albumsData[albumName];
+    const album=albumsData[albumName];
     const div=document.createElement('div');
     div.className='album';
     const coverSrc=album.cover?album.cover:'https://via.placeholder.com/400x400?text=No+Cover';
@@ -131,33 +121,42 @@ function playTrack(){
   playBtn.textContent='⏸';
 }
 
-playBtn.addEventListener('click',()=>{
-  if(audio.paused){audio.play().catch(()=>{}); playBtn.textContent='⏸';}
-  else{audio.pause(); playBtn.textContent='▶';}
+playBtn.addEventListener('click', ()=>{
+  if(audio.paused){ audio.play().catch(()=>{}); playBtn.textContent='⏸'; }
+  else{ audio.pause(); playBtn.textContent='▶'; }
 });
 
-prevBtn.addEventListener('click',()=>{
+prevBtn.addEventListener('click', ()=>{
   if(!currentAlbum) return;
   const len=albumsData[currentAlbum].tracks.length;
   currentTrackIndex=(currentTrackIndex-1+len)%len;
   playTrack();
 });
 
-nextBtn.addEventListener('click',()=>{
+nextBtn.addEventListener('click', ()=>{
   if(!currentAlbum) return;
   const len=albumsData[currentAlbum].tracks.length;
   currentTrackIndex=(currentTrackIndex+1)%len;
   playTrack();
 });
 
-audio.addEventListener('timeupdate',()=>{
+// Прогресс и время
+audio.addEventListener('timeupdate', ()=>{
   if(audio.duration){
     progress.value=(audio.currentTime/audio.duration)*100;
     timeDisplay.textContent=`${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
   }
 });
 
-progress.addEventListener('input',()=>{
+// Авто-переключение на следующий трек
+audio.addEventListener('ended', ()=>{
+  if(!currentAlbum) return;
+  const len=albumsData[currentAlbum].tracks.length;
+  currentTrackIndex=(currentTrackIndex+1)%len;
+  playTrack();
+});
+
+progress.addEventListener('input', ()=>{
   if(audio.duration){
     audio.currentTime=(progress.value/100)*audio.duration;
   }
@@ -169,10 +168,8 @@ function formatTime(sec){
   return `${m}:${s<10?'0':''}${s}`;
 }
 
-function escapeHtml(s){if(!s) return ''; return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-function escapeAttr(s){return (''+s).replace(/"/g,'&quot;');}
-
-console.log('Если ранее использовали SW, откройте DevTools → Application → Service Workers → Unregister и перезагрузите страницу.');
+function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function escapeAttr(s){ return (''+s).replace(/"/g,'&quot;'); }
 </script>
 </body>
 </html>
