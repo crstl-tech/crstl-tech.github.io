@@ -6,36 +6,31 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 <style>
-body { font-family: 'Montserrat', sans-serif; background:#0f0f0f; color:#fff; margin:0; padding:0; padding-bottom:110px; }
-header { padding:20px; text-align:center; font-size:2rem; font-weight:600; background: linear-gradient(90deg,#1f1f1f,#2a2a2a); letter-spacing:1px; }
+body { font-family: 'Montserrat', sans-serif; background:#121212; color:#fff; margin:0; padding:0; padding-bottom:120px; }
+header { padding:20px; text-align:center; font-size:2rem; font-weight:600; background:#1f1f1f; }
 .search-container { padding: 10px 20px; text-align:center; background:#1f1f1f; }
 .search-container input { width:100%; max-width:400px; padding:10px 14px; border-radius:12px; border:none; font-size:1rem; background:#222; color:#fff; }
 .search-container input::placeholder { color:#aaa; }
 .albums { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; padding:16px; }
-.album { background:#1b1b1b; border-radius:16px; overflow:hidden; text-align:center; padding:12px; transition: transform 0.25s, box-shadow 0.25s; }
-.album:hover { transform: translateY(-5px) scale(1.03); box-shadow:0 8px 20px rgba(79,195,247,0.5); }
-.album img { width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px; transition: transform 0.3s; }
-.album:hover img { transform: scale(1.05); }
+.album { background:#1b1b1b; border-radius:16px; overflow:hidden; text-align:center; padding:12px; }
+.album img { width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px; }
 .album h3 { margin:10px 0 4px 0; font-size:1.05rem; font-weight:600; color:#4fc3f7; }
 .album p { margin:0 0 8px 0; font-size:0.85rem; color:#aaa; }
 .tracks { text-align:left; margin-top:8px; max-height:180px; overflow:auto; }
-.track { padding:10px; cursor:pointer; border-radius:8px; margin-bottom:4px; transition: background 0.2s, transform 0.2s; }
-.track:hover { background: rgba(79,195,247,0.2); transform: translateX(5px); }
-.player { position:fixed; bottom:0; left:0; right:0; display:flex; flex-direction:column; gap:6px; padding:14px; background:#121212; border-top:1px solid #2b2b2b; z-index:999; box-shadow:0 -4px 20px rgba(0,0,0,0.6); border-radius:12px 12px 0 0; }
-.controls { display:flex; gap:12px; align-items:center; justify-content:center; }
-.btn { background:#4fc3f7; border:none; color:#111; padding:8px 14px; border-radius:8px; cursor:pointer; font-weight:600; font-size:1rem; transition: transform 0.1s, box-shadow 0.2s; }
-.btn:hover { transform: scale(1.1); box-shadow:0 4px 12px rgba(79,195,247,0.6); }
-.info { flex:1; padding-left:12px; font-size:1rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center; }
-audio { display:none; }
-.progress { width:100%; -webkit-appearance:none; height:8px; border-radius:6px; background:#222; cursor:pointer; transition: background 0.3s; }
-.progress::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:#4fc3f7; cursor:pointer; transition: transform 0.2s; }
-.progress::-webkit-slider-thumb:hover { transform: scale(1.2); }
-.time { font-size:0.9rem; color:#aaa; text-align:center; }
+.track { padding:10px; cursor:pointer; border-radius:8px; margin-bottom:4px; border-bottom:1px solid #2a2a2a; }
+.track:hover { background: rgba(79,195,247,0.1); }
+.player { position:fixed; bottom:0; left:0; right:0; display:flex; align-items:center; gap:12px; padding:12px 20px; background:#181818; border-top:1px solid #2b2b2b; z-index:999; }
+.player-cover { width:60px; height:60px; border-radius:8px; object-fit:cover; }
+.player-info { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.player-info .title { font-weight:600; font-size:1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.player-info .artist { font-size:0.85rem; color:#aaa; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.player-controls { display:flex; align-items:center; gap:12px; }
+.btn { background:#4fc3f7; border:none; color:#111; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:600; font-size:1rem; }
+.progress-container { flex:2; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.progress { width:100%; height:6px; border-radius:6px; background:#2a2a2a; -webkit-appearance:none; cursor:pointer; }
+.progress::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#4fc3f7; cursor:pointer; }
+.time { font-size:0.8rem; color:#aaa; text-align:center; }
 .msg { padding:20px; text-align:center; color:#bbb; font-size:1rem; }
-@media (max-width:520px){
-  .album img { height:auto; }
-  .controls { flex-wrap: wrap; gap:6px; }
-}
 </style>
 </head>
 <body>
@@ -48,14 +43,20 @@ audio { display:none; }
 <div id="albums" class="albums"><div class="msg">Загрузка...</div></div>
 
 <div id="player" class="player" style="display:none;">
-  <div class="info" id="player-info">—</div>
-  <input type="range" id="progress" min="0" max="100" value="0" class="progress">
-  <div class="controls">
+  <img id="player-cover" class="player-cover" src="" alt="cover">
+  <div class="player-info">
+    <div class="title" id="player-title">—</div>
+    <div class="artist" id="player-artist">—</div>
+  </div>
+  <div class="progress-container">
+    <input type="range" id="progress" min="0" max="100" value="0" class="progress">
+    <div class="time" id="time">0:00 / 0:00</div>
+  </div>
+  <div class="player-controls">
     <button id="prev" class="btn">⏮</button>
     <button id="play" class="btn">▶</button>
     <button id="next" class="btn">⏭</button>
   </div>
-  <div class="time" id="time">0:00 / 0:00</div>
   <audio id="audio" preload="none"></audio>
 </div>
 
@@ -65,15 +66,17 @@ let currentAlbum = null;
 let currentTrackIndex = 0;
 
 const albumsContainer = document.getElementById('albums');
-const player = document.getElementById('player');
+const searchInput = document.getElementById('search');
 const audio = document.getElementById('audio');
-const playerInfo = document.getElementById('player-info');
+const player = document.getElementById('player');
+const playerCover = document.getElementById('player-cover');
+const playerTitle = document.getElementById('player-title');
+const playerArtist = document.getElementById('player-artist');
+const progress = document.getElementById('progress');
+const timeDisplay = document.getElementById('time');
 const playBtn = document.getElementById('play');
 const prevBtn = document.getElementById('prev');
 const nextBtn = document.getElementById('next');
-const progress = document.getElementById('progress');
-const timeDisplay = document.getElementById('time');
-const searchInput = document.getElementById('search');
 
 fetch('music.json')
 .then(res => res.ok ? res.json() : Promise.reject('music.json не найден'))
@@ -137,7 +140,9 @@ function playTrack(){
   if(!track) return;
   audio.src=track.url;
   audio.play().catch(()=>{});
-  playerInfo.textContent=`${track.artist} — ${track.title}`;
+  playerCover.src=album.cover||'https://via.placeholder.com/400x400?text=No+Cover';
+  playerTitle.textContent = track.title;
+  playerArtist.textContent = track.artist;
   player.style.display='flex';
   playBtn.textContent='⏸';
 }
