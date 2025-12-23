@@ -2,198 +2,514 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8" />
-<title>Music</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Music</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 <style>
-body { font-family: 'Montserrat', sans-serif; background:#121212; color:#fff; margin:0; padding:0; padding-bottom:120px; }
-header { padding:20px; text-align:center; font-size:2rem; font-weight:600; background:#1f1f1f; }
-.search-container { padding: 10px 20px; text-align:center; background:#1f1f1f; }
-.search-container input { width:100%; max-width:400px; padding:10px 14px; border-radius:12px; border:none; font-size:1rem; background:#222; color:#fff; }
-.search-container input::placeholder { color:#aaa; }
-.albums { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; padding:16px; }
-.album { background:#1b1b1b; border-radius:16px; overflow:hidden; text-align:center; padding:12px; }
-.album img { width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px; }
-.album h3 { margin:10px 0 4px 0; font-size:1.05rem; font-weight:600; color:#4fc3f7; }
-.album p { margin:0 0 8px 0; font-size:0.85rem; color:#aaa; }
-.tracks { text-align:left; margin-top:8px; max-height:180px; overflow:auto; }
-.track { padding:10px; cursor:pointer; border-radius:8px; margin-bottom:4px; border-bottom:1px solid #2a2a2a; }
-.track:hover { background: rgba(79,195,247,0.1); }
-.player { position:fixed; bottom:0; left:0; right:0; display:flex; align-items:center; gap:12px; padding:12px 20px; background:#181818; border-top:1px solid #2b2b2b; z-index:999; }
-.player-cover { width:60px; height:60px; border-radius:8px; object-fit:cover; }
-.player-info { flex:1; display:flex; flex-direction:column; overflow:hidden; }
-.player-info .title { font-weight:600; font-size:1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.player-info .artist { font-size:0.85rem; color:#aaa; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.player-controls { display:flex; align-items:center; gap:12px; }
-.btn { background:#4fc3f7; border:none; color:#111; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:600; font-size:1rem; }
-.progress-container { flex:2; display:flex; flex-direction:column; align-items:center; gap:4px; }
-.progress { width:100%; height:6px; border-radius:6px; background:#2a2a2a; -webkit-appearance:none; cursor:pointer; }
-.progress::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#4fc3f7; cursor:pointer; }
-.time { font-size:0.8rem; color:#aaa; text-align:center; }
-.msg { padding:20px; text-align:center; color:#bbb; font-size:1rem; }
+  /* Reset / layout */
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;overflow-x:hidden;background:#0f0f10;color:#fff;font-family:'Montserrat',sans-serif}
+  a{color:inherit}
+  /* header + search */
+  header{padding:18px 16px;text-align:center;font-size:1.6rem;font-weight:600;background:linear-gradient(90deg,#121214,#19191a)}
+  .topbar{display:flex;gap:12px;align-items:center;justify-content:center;padding:12px;background:#131314}
+  .search{width:100%;max-width:720px}
+  .search input{width:100%;padding:10px 14px;border-radius:12px;border:0;background:#161617;color:#e8e8e8;font-size:1rem}
+  /* container */
+  .container{padding:18px;max-width:1200px;margin:0 auto}
+  /* Artists grid */
+  .grid{display:grid;gap:18px}
+  /* responsive columns */
+  @media(min-width:1100px){ .grid.cols-4{grid-template-columns:repeat(4,1fr)} .grid.cols-3{grid-template-columns:repeat(3,1fr)} }
+  @media(min-width:760px) and (max-width:1099px){ .grid.cols-3{grid-template-columns:repeat(3,1fr)} .grid.cols-2{grid-template-columns:repeat(2,1fr)} }
+  @media(max-width:759px){ .grid.cols-2{grid-template-columns:repeat(2,1fr)} .grid.cols-1{grid-template-columns:repeat(1,1fr)} }
+  /* Card styles */
+  .card{background:#151515;border-radius:12px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .card .cover{width:100%;aspect-ratio:1/1;border-radius:10px;object-fit:cover;display:block}
+  .card h4{margin:0;font-size:1rem;color:#fff;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%}
+  .card p{margin:0;font-size:0.85rem;color:#a8a8a8;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+  /* Breadcrumb / back */
+  .breadcrumbs{display:flex;gap:12px;align-items:center;margin:8px 0;color:#bdbdbd}
+  .btn-link{background:transparent;border:0;color:#9fdaf0;cursor:pointer;font-weight:600;padding:6px 8px;border-radius:8px}
+  /* Album list view */
+  .album-list{display:flex;flex-direction:column;gap:12px}
+  .album-row{display:flex;gap:12px;align-items:center;padding:8px 10px;background:#151515;border-radius:10px}
+  .album-row .album-cover{width:84px;height:84px;border-radius:8px;object-fit:cover}
+  .album-meta{flex:1;min-width:0}
+  .album-meta h5{margin:0;font-size:1rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .album-meta p{margin:4px 0 0 0;color:#a8a8a8;font-size:0.85rem}
+  .album-actions{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+  .small-btn{background:#272727;border:0;color:#fff;padding:6px 8px;border-radius:8px;cursor:pointer}
+  /* Track list */
+  .track-list{display:flex;flex-direction:column;gap:6px}
+  .track-row{display:flex;gap:12px;align-items:center;padding:8px;border-radius:8px}
+  .track-row .num{width:36px;text-align:center;color:#9e9e9e}
+  .track-row .track-title{flex:1;min-width:0}
+  .track-row .track-title .t{display:block;font-weight:600}
+  .track-row .track-title .a{display:block;color:#a8a8a8;font-size:0.9rem}
+  .play-btn{background:#4fc3f7;border:0;color:#111;padding:6px 10px;border-radius:8px;cursor:pointer}
+  /* Player footer (Spotify-like) */
+  .player{position:fixed;left:0;right:0;bottom:0;background:#121212;border-top:1px solid #222;padding:10px 14px;display:flex;align-items:center;gap:12px;z-index:999}
+  .player-left{display:flex;align-items:center;gap:12px;min-width:220px}
+  .player-cover{width:56px;height:56px;border-radius:6px;object-fit:cover}
+  .player-info{display:flex;flex-direction:column;min-width:0}
+  .player-title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .player-artist{color:#a8a8a8;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .player-center{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 12px}
+  .player-controls{display:flex;gap:10px;align-items:center}
+  .player-right{min-width:220px;display:flex;align-items:center;justify-content:flex-end;gap:12px}
+  .icon-btn{background:transparent;border:0;color:#fff;cursor:pointer;padding:6px;border-radius:6px}
+  .big-btn{background:#4fc3f7;border:0;color:#111;padding:10px 12px;border-radius:20px;cursor:pointer}
+  input[type=range]{-webkit-appearance:none;width:100%;height:6px;background:#222;border-radius:6px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#4fc3f7;cursor:pointer}
+  /* Fullscreen player modal */
+  .modal{position:fixed;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.85), rgba(0,0,0,0.95));display:flex;align-items:center;justify-content:center;z-index:1001;padding:20px}
+  .modal-card{width:100%;max-width:980px;background:transparent;border-radius:12px;padding:20px;display:flex;gap:24px;align-items:center}
+  .modal-cover{width:320px;height:320px;border-radius:12px;object-fit:cover}
+  .modal-right{flex:1;color:#fff}
+  .modal-title{font-size:1.6rem;font-weight:700;margin:0}
+  .modal-artist{color:#bfbfbf;margin:6px 0 16px 0}
+  .modal-tracks{margin-top:16px;max-height:360px;overflow:auto}
+  .close-modal{position:absolute;top:18px;right:18px;background:transparent;border:0;color:#fff;font-size:22px;cursor:pointer}
+  /* mobile tweaks */
+  @media(max-width:640px){
+    .player{flex-direction:column;align-items:stretch;padding:10px;gap:8px}
+    .player-left{min-width:auto;order:2;display:flex;gap:10px}
+    .player-center{order:1;padding:0}
+    .player-right{order:3;min-width:auto;justify-content:flex-start}
+    .player-title{font-size:0.95rem}
+    .player-artist{font-size:0.85rem}
+    .player-cover{width:48px;height:48px}
+    .modal-card{flex-direction:column;align-items:center}
+    .modal-cover{width:260px;height:260px}
+    .container{padding:12px}
+  }
 </style>
 </head>
 <body>
 
 <header>Music</header>
-<div class="search-container">
-  <input type="text" id="search" placeholder="Поиск по трекам или артистам...">
+
+<div class="topbar">
+  <div class="search">
+    <input id="globalSearch" placeholder="Поиск по артистам, альбомам, трекам...">
+  </div>
 </div>
 
-<div id="albums" class="albums"><div class="msg">Загрузка...</div></div>
+<div class="container" id="main">
+  <!-- Dynamic content injected here -->
+  <div id="content"></div>
+</div>
 
-<div id="player" class="player" style="display:none;">
-  <img id="player-cover" class="player-cover" src="" alt="cover">
-  <div class="player-info">
-    <div class="title" id="player-title">—</div>
-    <div class="artist" id="player-artist">—</div>
+<!-- Player footer -->
+<div id="player" class="player" style="display:none">
+  <div class="player-left">
+    <img id="playerCover" class="player-cover" src="" alt="cover">
+    <div class="player-info">
+      <div id="playerTitle" class="player-title">—</div>
+      <div id="playerArtist" class="player-artist">—</div>
+    </div>
   </div>
-  <div class="progress-container">
-    <input type="range" id="progress" min="0" max="100" value="0" class="progress">
-    <div class="time" id="time">0:00 / 0:00</div>
+
+  <div class="player-center">
+    <div class="player-controls">
+      <button id="btnPrev" class="icon-btn">⏮</button>
+      <button id="btnPlay" class="big-btn">▶</button>
+      <button id="btnNext" class="icon-btn">⏭</button>
+      <button id="btnOpen" class="icon-btn" title="Открыть плеер">⤢</button>
+    </div>
+    <input id="playerProgress" type="range" min="0" max="100" value="0">
   </div>
-  <div class="player-controls">
-    <button id="prev" class="btn">⏮</button>
-    <button id="play" class="btn">▶</button>
-    <button id="next" class="btn">⏭</button>
+
+  <div class="player-right">
+    <div id="playerTime" class="time">0:00 / 0:00</div>
   </div>
   <audio id="audio" preload="none"></audio>
 </div>
 
+<!-- Fullscreen modal player -->
+<div id="modal" class="modal" style="display:none">
+  <button id="closeModal" class="close-modal">✕</button>
+  <div class="modal-card">
+    <img id="modalCover" class="modal-cover" src="" alt="cover">
+    <div class="modal-right">
+      <h2 id="modalTitle" class="modal-title">—</h2>
+      <div id="modalArtist" class="modal-artist">—</div>
+      <div class="modal-controls" style="display:flex;gap:12px;margin-top:8px">
+        <button id="mPrev" class="btn-link">Prev</button>
+        <button id="mPlay" class="big-btn">▶</button>
+        <button id="mNext" class="btn-link">Next</button>
+      </div>
+      <div class="modal-tracks" id="modalTracks"></div>
+    </div>
+  </div>
+</div>
+
 <script>
-let albumsData = {};
-let currentAlbum = null;
-let currentTrackIndex = 0;
+/* ---------- Data structures ---------- */
+/*
+ Expected music.json: array of objects:
+ {
+   "artist":"Artist Name",
+   "album":"Album Title",
+   "title":"Track Title",
+   "url":"music/01 ... .mp3",
+   "cover":"music/Album_Title.jpg",  // optional
+   "year": 2021                    // optional
+ }
+*/
+let rawTracks = [];
+let artists = {}; // artists[name] -> {cover, albums:{albumName: {year, cover, tracks:[]}}}
+let viewState = { page:'artists', artist:null, album:null }; // simple navigation
+let current = { artist:null, album:null, index:0 };
 
-const albumsContainer = document.getElementById('albums');
-const searchInput = document.getElementById('search');
+/* DOM */
+const content = document.getElementById('content');
+const globalSearch = document.getElementById('globalSearch');
+
 const audio = document.getElementById('audio');
-const player = document.getElementById('player');
-const playerCover = document.getElementById('player-cover');
-const playerTitle = document.getElementById('player-title');
-const playerArtist = document.getElementById('player-artist');
-const progress = document.getElementById('progress');
-const timeDisplay = document.getElementById('time');
-const playBtn = document.getElementById('play');
-const prevBtn = document.getElementById('prev');
-const nextBtn = document.getElementById('next');
+const playerEl = document.getElementById('player');
+const playerCover = document.getElementById('playerCover');
+const playerTitle = document.getElementById('playerTitle');
+const playerArtist = document.getElementById('playerArtist');
+const playerProgress = document.getElementById('playerProgress');
+const playerTime = document.getElementById('playerTime');
+const btnPlay = document.getElementById('btnPlay');
+const btnPrev = document.getElementById('btnPrev');
+const btnNext = document.getElementById('btnNext');
+const btnOpen = document.getElementById('btnOpen');
 
-fetch('music.json')
-.then(res => res.ok ? res.json() : Promise.reject('music.json не найден'))
-.then(tracks => {
-  if(!Array.isArray(tracks) || !tracks.length){
-    albumsContainer.innerHTML='<div class="msg">music.json пуст или неверный формат.</div>';
-    return;
-  }
-  tracks.forEach(t=>{
-    const albumName = t.album||'Unknown Album';
-    if(!albumsData[albumName]) albumsData[albumName]={cover:t.cover||null,tracks:[]};
-    albumsData[albumName].tracks.push({title:t.title||t.url, artist:t.artist||'', url:t.url});
-  });
-  renderAlbums();
-})
-.catch(err=>{
-  console.error(err);
-  albumsContainer.innerHTML='<div class="msg">Не удалось загрузить music.json.</div>';
+/* Modal */
+const modal = document.getElementById('modal');
+const closeModal = document.getElementById('closeModal');
+const modalCover = document.getElementById('modalCover');
+const modalTitle = document.getElementById('modalTitle');
+const modalArtist = document.getElementById('modalArtist');
+const mPlay = document.getElementById('mPlay');
+const mPrev = document.getElementById('mPrev');
+const mNext = document.getElementById('mNext');
+const modalTracks = document.getElementById('modalTracks');
+
+/* Load JSON */
+fetch('music.json').then(r=>{
+  if(!r.ok) throw new Error('music.json not found');
+  return r.json();
+}).then(data=>{
+  rawTracks = data;
+  buildIndex();
+  renderArtists();
+}).catch(e=>{
+  content.innerHTML = '<div class="msg">Не удалось загрузить music.json — проверьте файл и пути.</div>';
+  console.error(e);
 });
 
-function renderAlbums(filter=''){
-  albumsContainer.innerHTML='';
-  const filterLower = filter.toLowerCase();
-  for(const albumName of Object.keys(albumsData)){
-    const album=albumsData[albumName];
-    const tracksFiltered = album.tracks.filter(t => t.title.toLowerCase().includes(filterLower) || t.artist.toLowerCase().includes(filterLower));
-    if(tracksFiltered.length === 0) continue;
-    const div=document.createElement('div');
-    div.className='album';
-    const coverSrc=album.cover?album.cover:'https://via.placeholder.com/400x400?text=No+Cover';
-    const artist=album.tracks[0]?.artist||'';
-    div.innerHTML=`
-      <img src="${coverSrc}" alt="cover">
-      <h3>${escapeHtml(albumName)}</h3>
-      <p>${escapeHtml(artist)}</p>
-      <div class="tracks">
-        ${tracksFiltered.map((t,i)=>`<div class="track" data-album="${escapeAttr(albumName)}" data-index="${album.tracks.indexOf(t)}">${escapeHtml(t.title)}</div>`).join('')}
-      </div>
-    `;
-    albumsContainer.appendChild(div);
-  }
-  if(!albumsContainer.querySelector('.album')){
-    albumsContainer.innerHTML='<div class="msg">Треков не найдено.</div>';
-  }
-  document.querySelectorAll('.track').forEach(el=>{
-    el.addEventListener('click', ()=>{
-      currentAlbum=el.dataset.album;
-      currentTrackIndex=parseInt(el.dataset.index,10);
-      playTrack();
-    });
+/* Build artists / albums index */
+function buildIndex(){
+  artists = {};
+  rawTracks.forEach(t=>{
+    const artist = t.artist || 'Unknown Artist';
+    const album = t.album || 'Unknown Album';
+    if(!artists[artist]) artists[artist] = { cover: t.cover || null, albums:{} };
+    if(!artists[artist].albums[album]) artists[artist].albums[album] = { year: t.year || null, cover: t.cover || null, tracks: [] };
+    artists[artist].albums[album].tracks.push({ title: t.title || t.url, url: t.url, artist: artist, year: t.year || null });
+    // prefer cover if not set
+    if(!artists[artist].cover && t.cover) artists[artist].cover = t.cover;
+    if(!artists[artist].albums[album].cover && t.cover) artists[artist].albums[album].cover = t.cover;
   });
 }
 
-searchInput.addEventListener('input', ()=>{ renderAlbums(searchInput.value); });
+/* ---------- Views ---------- */
 
-function playTrack(){
-  if(!currentAlbum) return;
-  const album=albumsData[currentAlbum];
-  if(!album) return;
-  const track=album.tracks[currentTrackIndex];
-  if(!track) return;
-  audio.src=track.url;
+function renderArtists(filter=''){
+  viewState.page='artists'; viewState.artist=null; viewState.album=null;
+  content.innerHTML = '';
+  const keys = Object.keys(artists).sort((a,b)=>a.localeCompare(b,'ru',{sensitivity:'base'}));
+  const grid = document.createElement('div'); grid.className = 'grid cols-4 cols-3 cols-2 cols-1';
+  let count=0;
+  keys.forEach(name=>{
+    const a = artists[name];
+    // filter
+    const f = filter.toLowerCase();
+    if(f && !(name.toLowerCase().includes(f) || Object.keys(a.albums).some(al=>al.toLowerCase().includes(f) || a.albums[al].tracks.some(tr=>tr.title.toLowerCase().includes(f))))) return;
+    const card = document.createElement('div'); card.className='card';
+    const img = document.createElement('img'); img.className='cover'; img.src = a.cover || 'https://via.placeholder.com/400x400?text=No+Cover'; img.alt = name;
+    const h = document.createElement('h4'); h.textContent = name;
+    const p = document.createElement('p'); p.textContent = Object.keys(a.albums).length + ' album(s)';
+    card.appendChild(img); card.appendChild(h); card.appendChild(p);
+    card.addEventListener('click', ()=>{ renderAlbums(name); });
+    grid.appendChild(card); count++;
+  });
+  if(count===0){
+    content.innerHTML = '<div class="msg">Артисты не найдены</div>'; return;
+  }
+  content.appendChild(grid);
+}
+
+/* Albums view for artist with sorting */
+function renderAlbums(artistName, sortBy='title', order='asc', filter=''){
+  viewState.page='albums'; viewState.artist=artistName; viewState.album=null;
+  const obj = artists[artistName];
+  if(!obj){ renderArtists(); return; }
+  content.innerHTML = '';
+  // header / breadcrumbs
+  const bc = createBreadcrumbs([{label:'Artists', action:()=>renderArtists(globalSearch.value)},{label:artistName}]);
+  content.appendChild(bc);
+  // controls: sort/select
+  const controls = document.createElement('div'); controls.style.display='flex'; controls.style.gap='12px'; controls.style.margin='12px 0'; controls.style.alignItems='center';
+  // sort select
+  const sortSel = document.createElement('select');
+  sortSel.innerHTML = `<option value="title">Sort: Title (A–Z)</option><option value="title_desc">Title (Z–A)</option><option value="year_desc">Year (new→old)</option><option value="year_asc">Year (old→new)</option>`;
+  controls.appendChild(sortSel);
+  // filter hint
+  const showCount = document.createElement('div'); showCount.style.marginLeft='auto'; showCount.style.color='#bdbdbd';
+  content.appendChild(controls);
+  // album list
+  const albumsArr = Object.keys(obj.albums).map(al=>({name:al,info:obj.albums[al]}));
+  // apply filter
+  const f = filter.toLowerCase();
+  const filteredAlbums = albumsArr.filter(a=>!f || a.name.toLowerCase().includes(f) || a.info.tracks.some(tr=>tr.title.toLowerCase().includes(f)));
+  // sorting
+  filteredAlbums.sort((A,B)=>{
+    if(sortSel.value==='title') return A.name.localeCompare(B.name,'ru',{sensitivity:'base'});
+    if(sortSel.value==='title_desc') return B.name.localeCompare(A.name,'ru',{sensitivity:'base'});
+    if(sortSel.value==='year_desc') return (B.info.year||0)-(A.info.year||0) || B.name.localeCompare(A.name);
+    if(sortSel.value==='year_asc') return (A.info.year||0)-(B.info.year||0) || A.name.localeCompare(B.name);
+    return 0;
+  });
+  // render
+  const list = document.createElement('div'); list.className='album-list';
+  filteredAlbums.forEach(alObj=>{
+    const row = document.createElement('div'); row.className='album-row';
+    const img = document.createElement('img'); img.className='album-cover'; img.src = alObj.info.cover || obj.cover || 'https://via.placeholder.com/400x400?text=No+Cover';
+    const meta = document.createElement('div'); meta.className='album-meta';
+    const h = document.createElement('h5'); h.textContent = alObj.name;
+    const p = document.createElement('p'); p.textContent = (alObj.info.year?alObj.info.year+' • ':'') + alObj.info.tracks.length + ' трек(ов)';
+    meta.appendChild(h); meta.appendChild(p);
+    const actions = document.createElement('div'); actions.className='album-actions';
+    const openBtn = document.createElement('button'); openBtn.className='small-btn'; openBtn.textContent='Open';
+    openBtn.addEventListener('click', ()=> renderTracks(artistName, alObj.name));
+    actions.appendChild(openBtn);
+    row.appendChild(img); row.appendChild(meta); row.appendChild(actions);
+    row.addEventListener('click', (e)=>{ if(e.target===openBtn) return; renderTracks(artistName, alObj.name); });
+    list.appendChild(row);
+  });
+  content.appendChild(list);
+  // sort select handling
+  sortSel.addEventListener('change', ()=> renderAlbums(artistName, sortSel.value, 'asc', filter) );
+}
+
+/* Tracks view */
+function renderTracks(artistName, albumName){
+  viewState.page='tracks'; viewState.artist=artistName; viewState.album=albumName;
+  const album = artists[artistName].albums[albumName];
+  if(!album){ renderAlbums(artistName); return; }
+  content.innerHTML='';
+  const bc = createBreadcrumbs([{label:'Artists', action:()=>renderArtists(globalSearch.value)},{label:artistName, action:()=>renderAlbums(artistName)},{label:albumName}]);
+  content.appendChild(bc);
+  // album header
+  const header = document.createElement('div'); header.style.display='flex';header.style.gap='12px';header.style.alignItems='center';header.style.margin='10px 0';
+  const img = document.createElement('img'); img.src = album.cover || artists[artistName].cover || 'https://via.placeholder.com/400x400?text=No+Cover'; img.style.width='140px'; img.style.height='140px'; img.style.borderRadius='10px'; img.style.objectFit='cover';
+  const meta = document.createElement('div'); meta.style.flex='1';
+  const title = document.createElement('h3'); title.textContent = albumName; title.style.margin='0';
+  const art = document.createElement('div'); art.textContent = artistName; art.style.color='#bdbdbd'; art.style.marginTop='8px';
+  meta.appendChild(title); meta.appendChild(art);
+  header.appendChild(img); header.appendChild(meta);
+  content.appendChild(header);
+  // track list
+  const tracksDiv = document.createElement('div'); tracksDiv.className='track-list';
+  album.tracks.forEach((tr,i)=>{
+    const row = document.createElement('div'); row.className='track-row';
+    const num = document.createElement('div'); num.className='num'; num.textContent = (i+1).toString().padStart(2,'0');
+    const tmeta = document.createElement('div'); tmeta.className='track-title';
+    const tt = document.createElement('span'); tt.className='t'; tt.textContent = tr.title;
+    const ta = document.createElement('span'); ta.className='a'; ta.textContent = tr.artist;
+    tmeta.appendChild(tt); tmeta.appendChild(ta);
+    const play = document.createElement('button'); play.className='play-btn'; play.textContent='Play';
+    play.addEventListener('click', ()=>{ playByIndex(artistName, albumName, i); });
+    row.appendChild(num); row.appendChild(tmeta); row.appendChild(play);
+    tracksDiv.appendChild(row);
+  });
+  content.appendChild(tracksDiv);
+}
+
+/* Breadcrumb helper */
+function createBreadcrumbs(items){
+  const bc = document.createElement('div'); bc.className='breadcrumbs';
+  items.forEach((it,i)=>{
+    const el = document.createElement('span');
+    if(it.action){
+      const btn = document.createElement('button'); btn.className='btn-link'; btn.textContent = it.label; btn.addEventListener('click', it.action);
+      el.appendChild(btn);
+    } else {
+      const txt = document.createElement('span'); txt.textContent = it.label; el.appendChild(txt);
+    }
+    bc.appendChild(el);
+    if(i < items.length-1){
+      const sep = document.createElement('span'); sep.textContent = '›'; sep.style.color='#666'; bc.appendChild(sep);
+    }
+  });
+  return bc;
+}
+
+/* ---------- Player controls ---------- */
+
+function playByIndex(artistName, albumName, idx){
+  current.artist = artistName; current.album = albumName; current.index = idx;
+  const tr = artists[artistName].albums[albumName].tracks[idx];
+  if(!tr) return;
+  audio.src = tr.url;
   audio.play().catch(()=>{});
-  playerCover.src=album.cover||'https://via.placeholder.com/400x400?text=No+Cover';
+  showPlayerFor(tr, artists[artistName].albums[albumName].cover || artists[artistName].cover);
+  updateMediaSession(tr, artists[artistName].albums[albumName].cover);
+}
+
+function showPlayerFor(track, cover){
+  playerEl = playerEl; // noop to avoid lint
+  playerEl = document.getElementById('player'); // ensure
+  playerEl.style.display = 'flex';
+  playerCover.src = cover || 'https://via.placeholder.com/400x400?text=No+Cover';
   playerTitle.textContent = track.title;
   playerArtist.textContent = track.artist;
-  player.style.display='flex';
-  playBtn.textContent='⏸';
 }
 
-playBtn.addEventListener('click', ()=>{
-  if(audio.paused){ audio.play().catch(()=>{}); playBtn.textContent='⏸'; }
-  else{ audio.pause(); playBtn.textContent='▶'; }
-});
-
-prevBtn.addEventListener('click', ()=>{
-  if(!currentAlbum) return;
-  const len=albumsData[currentAlbum].tracks.length;
-  currentTrackIndex=(currentTrackIndex-1+len)%len;
-  playTrack();
-});
-
-nextBtn.addEventListener('click', ()=>{
-  if(!currentAlbum) return;
-  const len=albumsData[currentAlbum].tracks.length;
-  currentTrackIndex=(currentTrackIndex+1)%len;
-  playTrack();
-});
-
+/* Hook audio events */
 audio.addEventListener('timeupdate', ()=>{
   if(audio.duration){
-    progress.value=(audio.currentTime/audio.duration)*100;
-    timeDisplay.textContent=`${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+    playerProgress.value = (audio.currentTime / audio.duration) * 100;
+    playerTime.textContent = formatTime(audio.currentTime) + ' / ' + formatTime(audio.duration);
+    // update position state for media session (if available)
+    if('setPositionState' in navigator.mediaSession){
+      try{
+        navigator.mediaSession.setPositionState({duration: audio.duration, position: audio.currentTime});
+      }catch(e){}
+    }
   }
 });
 
 audio.addEventListener('ended', ()=>{
-  if(!currentAlbum) return;
-  const len=albumsData[currentAlbum].tracks.length;
-  currentTrackIndex=(currentTrackIndex+1)%len;
-  playTrack();
-});
-
-progress.addEventListener('input', ()=>{
-  if(audio.duration){
-    audio.currentTime=(progress.value/100)*audio.duration;
+  // next track in album, or loop to start
+  if(current.artist && current.album){
+    const tracks = artists[current.artist].albums[current.album].tracks;
+    current.index = (current.index + 1) % tracks.length;
+    playByIndex(current.artist, current.album, current.index);
   }
 });
 
-function formatTime(sec){
-  const m=Math.floor(sec/60);
-  const s=Math.floor(sec%60);
-  return `${m}:${s<10?'0':''}${s}`;
+/* Player buttons */
+btnPlay.addEventListener('click', ()=>{
+  if(audio.paused) { audio.play().catch(()=>{}); btnPlay.textContent='⏸'; mPlay.textContent='⏸'; }
+  else { audio.pause(); btnPlay.textContent='▶'; mPlay.textContent='▶'; }
+});
+btnPrev.addEventListener('click', ()=>{ if(current.artist) { const len = artists[current.artist].albums[current.album].tracks.length; current.index = (current.index-1+len)%len; playByIndex(current.artist,current.album,current.index); }});
+btnNext.addEventListener('click', ()=>{ if(current.artist) { const len = artists[current.artist].albums[current.album].tracks.length; current.index = (current.index+1)%len; playByIndex(current.artist,current.album,current.index); }});
+
+playerProgress.addEventListener('input', ()=>{
+  if(audio.duration) audio.currentTime = (playerProgress.value/100) * audio.duration;
+});
+
+/* Open fullscreen modal */
+btnOpen.addEventListener('click', openModal);
+function openModal(){
+  if(!current.artist) return;
+  modal.style.display='flex';
+  const album = artists[current.artist].albums[current.album];
+  const tr = album.tracks[current.index];
+  modalCover.src = album.cover || artists[current.artist].cover || 'https://via.placeholder.com/400x400?text=No+Cover';
+  modalTitle.textContent = tr.title;
+  modalArtist.textContent = current.artist;
+  // modal tracklist
+  modalTracks.innerHTML='';
+  album.tracks.forEach((t,i)=>{
+    const r = document.createElement('div'); r.style.display='flex'; r.style.justifyContent='space-between'; r.style.padding='8px'; r.style.borderBottom='1px solid #1f1f1f';
+    const left = document.createElement('div'); left.textContent = (i+1) + '. ' + t.title;
+    const right = document.createElement('div'); const btn = document.createElement('button'); btn.textContent = (i===current.index)?'Playing':'Play'; btn.className='small-btn';
+    btn.addEventListener('click', ()=>{ playByIndex(current.artist,current.album,i); });
+    right.appendChild(btn); r.appendChild(left); r.appendChild(right); modalTracks.appendChild(r);
+  });
 }
 
-function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-function escapeAttr(s){ return (''+s).replace(/"/g,'&quot;'); }
+/* Modal controls + close */
+closeModal.addEventListener('click', ()=>{ modal.style.display='none'; });
+mPlay.addEventListener('click', ()=>{ if(audio.paused){ audio.play(); mPlay.textContent='⏸'; btnPlay.textContent='⏸'; } else { audio.pause(); mPlay.textContent='▶'; btnPlay.textContent='▶'; }});
+mPrev.addEventListener('click', ()=> btnPrev.click());
+mNext.addEventListener('click', ()=> btnNext.click());
+
+/* Search global */
+globalSearch.addEventListener('input', (e)=>{
+  const v = e.target.value.trim();
+  if(!v) return renderArtists('');
+  // if there's exact artist match -> open artist view
+  const byArtist = Object.keys(artists).filter(a=>a.toLowerCase().includes(v.toLowerCase()));
+  if(byArtist.length===1 && artists[byArtist[0]].albums) { renderAlbums(byArtist[0]); return; }
+  // otherwise show artists filtered
+  renderArtists(v);
+});
+
+/* Media Session API for lock screen controls */
+if('mediaSession' in navigator){
+  navigator.mediaSession.setActionHandler('play', ()=>{ audio.play(); btnPlay.textContent='⏸'; });
+  navigator.mediaSession.setActionHandler('pause', ()=>{ audio.pause(); btnPlay.textContent='▶'; });
+  navigator.mediaSession.setActionHandler('previoustrack', ()=> btnPrev.click());
+  navigator.mediaSession.setActionHandler('nexttrack', ()=> btnNext.click());
+}
+
+function updateMediaSession(track, cover){
+  if(!('mediaSession' in navigator)) return;
+  try{
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.title,
+      artist: track.artist,
+      album: current.album || '',
+      artwork: [
+        { src: cover || 'https://via.placeholder.com/400x400?text=No+Cover', sizes: '512x512', type: 'image/jpeg' }
+      ]
+    });
+    if('setPositionState' in navigator.mediaSession && audio.duration){
+      navigator.mediaSession.setPositionState({ duration: audio.duration, position: audio.currentTime });
+    }
+  }catch(e){ console.warn('mediaSession failed', e); }
+}
+
+/* Utils */
+function formatTime(sec){ if(!sec || isNaN(sec)) return '0:00'; const m=Math.floor(sec/60); const s=Math.floor(sec%60); return m + ':' + (s<10?'0':'') + s; }
+function escapeHtml(s){ return String(s||''); }
+function escapeAttr(s){ return String(s||''); }
+
+/* Initial view: artists */
+function renderArtists(){
+  // wrapper to satisfy earlier function signature
+  renderArtists = function(filter=''){ renderArtistsImpl(filter); }; // rewrite for performance
+}
+function renderArtistsImpl(filter=''){
+  content.innerHTML = '';
+  const title = document.createElement('div'); title.style.marginBottom='8px';
+  content.appendChild(title);
+  const grid = document.createElement('div'); grid.className='grid cols-4 cols-3 cols-2 cols-1';
+  let count=0;
+  Object.keys(artists).sort((a,b)=>a.localeCompare(b,'ru',{sensitivity:'base'})).forEach(name=>{
+    const art = artists[name];
+    const f = filter.toLowerCase();
+    if(f && !(name.toLowerCase().includes(f) || Object.keys(art.albums).some(al=>al.toLowerCase().includes(f) || art.albums[al].tracks.some(tr=>tr.title.toLowerCase().includes(f))))) return;
+    const card = document.createElement('div'); card.className='card';
+    const img = document.createElement('img'); img.className='cover'; img.src = art.cover || (art.albums && Object.values(art.albums)[0] && Object.values(art.albums)[0].cover) || 'https://via.placeholder.com/400x400?text=No+Cover';
+    const h = document.createElement('h4'); h.textContent = name;
+    const p = document.createElement('p'); p.textContent = Object.keys(art.albums).length + ' album(s)';
+    card.appendChild(img); card.appendChild(h); card.appendChild(p);
+    card.addEventListener('click', ()=> renderAlbums(name));
+    grid.appendChild(card); count++;
+  });
+  if(count===0){ content.innerHTML = '<div class="msg">Ничего не найдено</div>'; return; }
+  content.appendChild(grid);
+}
+/* ensure original name works */
+renderArtistsImpl();
+
+/* Expose renderAlbums function globally (used earlier) */
+window.renderAlbums = function(artistName){ renderAlbums(artistName,'title','asc',''); };
+window.renderTracks = renderTracks;
+
+/* Prevent accidental horizontal scroll on mobile */
+window.addEventListener('resize', ()=>{ document.body.style.overflowX = 'hidden'; });
 </script>
 </body>
 </html>
