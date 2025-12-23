@@ -2,35 +2,48 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8" />
-<title>Music Player</title>
+<title>Music</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 <style>
-body { font-family: Arial, sans-serif; background:#121212; color:#fff; margin:0; padding:0; padding-bottom:90px; /* место для плеера */ }
-header { padding:20px; text-align:center; font-size:1.6rem; background:#1f1f1f; }
-.albums { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; padding:16px; }
-.album { background:#1f1f1f; border-radius:10px; overflow:hidden; text-align:center; padding:10px; }
-.album img { width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px; }
-.album h3 { margin:10px 0 4px 0; font-size:1rem; }
-.album p { margin:0 0 8px 0; font-size:0.85rem; color:#bbb; }
+body { font-family: 'Montserrat', sans-serif; background:#0f0f0f; color:#fff; margin:0; padding:0; padding-bottom:110px; }
+header { padding:20px; text-align:center; font-size:2rem; font-weight:600; background: linear-gradient(90deg,#1f1f1f,#2a2a2a); letter-spacing:1px; }
+.search-container { padding: 10px 20px; text-align:center; background:#1f1f1f; }
+.search-container input { width:100%; max-width:400px; padding:10px 14px; border-radius:12px; border:none; font-size:1rem; background:#222; color:#fff; }
+.search-container input::placeholder { color:#aaa; }
+.albums { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; padding:16px; }
+.album { background:#1b1b1b; border-radius:16px; overflow:hidden; text-align:center; padding:12px; transition: transform 0.25s, box-shadow 0.25s; }
+.album:hover { transform: translateY(-5px) scale(1.03); box-shadow:0 8px 20px rgba(79,195,247,0.5); }
+.album img { width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px; transition: transform 0.3s; }
+.album:hover img { transform: scale(1.05); }
+.album h3 { margin:10px 0 4px 0; font-size:1.05rem; font-weight:600; color:#4fc3f7; }
+.album p { margin:0 0 8px 0; font-size:0.85rem; color:#aaa; }
 .tracks { text-align:left; margin-top:8px; max-height:180px; overflow:auto; }
-.track { padding:8px; cursor:pointer; border-bottom:1px solid #2a2a2a; }
-.track:hover { background:#222; }
-.player { position:fixed; bottom:0; left:0; right:0; display:flex; flex-direction:column; gap:4px; padding:10px; background:#141414; border-top:1px solid #2b2b2b; z-index:999; }
-.controls { display:flex; gap:8px; align-items:center; }
-.btn { background:#4fc3f7; border:none; color:#111; padding:6px 10px; border-radius:6px; cursor:pointer; font-weight:600; }
-.info { flex:1; padding-left:12px; font-size:0.95rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.track { padding:10px; cursor:pointer; border-radius:8px; margin-bottom:4px; transition: background 0.2s, transform 0.2s; }
+.track:hover { background: rgba(79,195,247,0.2); transform: translateX(5px); }
+.player { position:fixed; bottom:0; left:0; right:0; display:flex; flex-direction:column; gap:6px; padding:14px; background:#121212; border-top:1px solid #2b2b2b; z-index:999; box-shadow:0 -4px 20px rgba(0,0,0,0.6); border-radius:12px 12px 0 0; }
+.controls { display:flex; gap:12px; align-items:center; justify-content:center; }
+.btn { background:#4fc3f7; border:none; color:#111; padding:8px 14px; border-radius:8px; cursor:pointer; font-weight:600; font-size:1rem; transition: transform 0.1s, box-shadow 0.2s; }
+.btn:hover { transform: scale(1.1); box-shadow:0 4px 12px rgba(79,195,247,0.6); }
+.info { flex:1; padding-left:12px; font-size:1rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center; }
 audio { display:none; }
-.progress { width:100%; -webkit-appearance:none; height:5px; border-radius:5px; background:#2a2a2a; cursor:pointer; }
-.progress::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:#4fc3f7; cursor:pointer; }
-.time { font-size:0.85rem; color:#bbb; }
-.msg { padding:20px; text-align:center; color:#bbb; }
+.progress { width:100%; -webkit-appearance:none; height:8px; border-radius:6px; background:#222; cursor:pointer; transition: background 0.3s; }
+.progress::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:#4fc3f7; cursor:pointer; transition: transform 0.2s; }
+.progress::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.time { font-size:0.9rem; color:#aaa; text-align:center; }
+.msg { padding:20px; text-align:center; color:#bbb; font-size:1rem; }
 @media (max-width:520px){
   .album img { height:auto; }
+  .controls { flex-wrap: wrap; gap:6px; }
 }
 </style>
 </head>
 <body>
-<header>🎵 My Music Player</header>
+
+<header>Music</header>
+<div class="search-container">
+  <input type="text" id="search" placeholder="Поиск по трекам или артистам...">
+</div>
 
 <div id="albums" class="albums"><div class="msg">Загрузка...</div></div>
 
@@ -41,8 +54,8 @@ audio { display:none; }
     <button id="prev" class="btn">⏮</button>
     <button id="play" class="btn">▶</button>
     <button id="next" class="btn">⏭</button>
-    <span id="time" class="time">0:00 / 0:00</span>
   </div>
+  <div class="time" id="time">0:00 / 0:00</div>
   <audio id="audio" preload="none"></audio>
 </div>
 
@@ -60,8 +73,8 @@ const prevBtn = document.getElementById('prev');
 const nextBtn = document.getElementById('next');
 const progress = document.getElementById('progress');
 const timeDisplay = document.getElementById('time');
+const searchInput = document.getElementById('search');
 
-// Загружаем music.json
 fetch('music.json')
 .then(res => res.ok ? res.json() : Promise.reject('music.json не найден'))
 .then(tracks => {
@@ -81,10 +94,13 @@ fetch('music.json')
   albumsContainer.innerHTML='<div class="msg">Не удалось загрузить music.json.</div>';
 });
 
-function renderAlbums(){
+function renderAlbums(filter=''){
   albumsContainer.innerHTML='';
+  const filterLower = filter.toLowerCase();
   for(const albumName of Object.keys(albumsData)){
     const album=albumsData[albumName];
+    const tracksFiltered = album.tracks.filter(t => t.title.toLowerCase().includes(filterLower) || t.artist.toLowerCase().includes(filterLower));
+    if(tracksFiltered.length === 0) continue;
     const div=document.createElement('div');
     div.className='album';
     const coverSrc=album.cover?album.cover:'https://via.placeholder.com/400x400?text=No+Cover';
@@ -94,10 +110,13 @@ function renderAlbums(){
       <h3>${escapeHtml(albumName)}</h3>
       <p>${escapeHtml(artist)}</p>
       <div class="tracks">
-        ${album.tracks.map((t,i)=>`<div class="track" data-album="${escapeAttr(albumName)}" data-index="${i}">${escapeHtml(t.title)}</div>`).join('')}
+        ${tracksFiltered.map((t,i)=>`<div class="track" data-album="${escapeAttr(albumName)}" data-index="${album.tracks.indexOf(t)}">${escapeHtml(t.title)}</div>`).join('')}
       </div>
     `;
     albumsContainer.appendChild(div);
+  }
+  if(!albumsContainer.querySelector('.album')){
+    albumsContainer.innerHTML='<div class="msg">Треков не найдено.</div>';
   }
   document.querySelectorAll('.track').forEach(el=>{
     el.addEventListener('click', ()=>{
@@ -107,6 +126,8 @@ function renderAlbums(){
     });
   });
 }
+
+searchInput.addEventListener('input', ()=>{ renderAlbums(searchInput.value); });
 
 function playTrack(){
   if(!currentAlbum) return;
@@ -140,7 +161,6 @@ nextBtn.addEventListener('click', ()=>{
   playTrack();
 });
 
-// Прогресс и время
 audio.addEventListener('timeupdate', ()=>{
   if(audio.duration){
     progress.value=(audio.currentTime/audio.duration)*100;
@@ -148,7 +168,6 @@ audio.addEventListener('timeupdate', ()=>{
   }
 });
 
-// Авто-переключение на следующий трек
 audio.addEventListener('ended', ()=>{
   if(!currentAlbum) return;
   const len=albumsData[currentAlbum].tracks.length;
