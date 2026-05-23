@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
 
-/* Подключаем Google Sans (в веб-среде его аналог Product Sans / Google Sans Display) */
+/* Подключаем правильный Google Sans */
 @font-face {
     font-family: 'Google Sans';
     font-style: normal;
@@ -15,7 +15,7 @@
 }
 
 :root {
-    /* M3 Тональная палитра (Светлая тема) */
+    /* M3 Светлая тема */
     --md-sys-color-background: #FDFBFF;
     --md-sys-color-surface: #FDFBFF;
     --md-sys-color-surface-container: #F3F3FA;
@@ -35,7 +35,7 @@
 
     /* Скругления M3 Expressive */
     --md-sys-shape-corner-full: 9999px;
-    --md-sys-shape-corner-expressive-btn: 24px; /* Фирменный сквиркл-эффект */
+    --md-sys-shape-corner-expressive-btn: 28px; /* Выразительные скругленные квадраты */
 }
 
 * {
@@ -49,63 +49,63 @@ body {
     background-color: var(--md-sys-color-background);
     font-family: 'Roboto', sans-serif;
     height: 100vh;
-    height: 100dvh; /* Поддержка динамической высоты на мобильных */
-    overflow: hidden;
-    display: flex;
-}
-
-.calculator-fullscreen {
+    height: 100dvh; /* Для мобильных браузеров, чтобы не скрывалось за панелями */
     width: 100vw;
-    height: 100%;
     display: flex;
-    flex-direction: column;
-    padding: 24px;
-    gap: 16px;
-    max-width: 600px; /* Ограничение для десктопов, чтобы калькулятор не растягивался слишком сильно */
-    margin: 0 auto;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 }
 
-/* Верхний экран */
-.display {
-    flex: 1; /* Занимает всё свободное место сверху */
+/* Контейнер теперь растягивается на 100% ширины телефона */
+.calculator-fullscreen {
+    width: 100%;
+    height: 100%;
+    max-width: 480px; /* Ограничение для десктопов, на мобильном будет во весь экран */
     display: flex;
     flex-direction: column;
-    justify-content: flex-end; /* Текст прижимается к кнопкам */
+    padding: 20px;
+    gap: 16px;
+}
+
+/* Зона дисплея */
+.display {
+    flex: 1; /* Занимает всю верхнюю часть */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
     align-items: flex-end;
-    padding: 16px 8px;
-    gap: 12px;
+    padding: 24px 12px;
 }
 
 .previous-operand {
     font-family: 'Google Sans', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     color: var(--md-sys-color-on-surface-variant);
     opacity: 0.7;
-    min-height: 2rem;
-    letter-spacing: 0px;
+    min-height: 1.8rem;
 }
 
 .current-operand {
     font-family: 'Google Sans', sans-serif;
-    font-size: clamp(3rem, 12vh, 5rem); /* Размер адаптивно подстраивается под высоту экрана */
+    font-size: clamp(3rem, 10vh, 5.5rem); /* Авто-подбор размера под экран */
     font-weight: 400;
     color: var(--md-sys-color-on-surface);
     line-height: 1.1;
     word-break: break-all;
-    text-align: right;
 }
 
-/* Сетка клавиатуры */
+/* Исправленная сетка клавиатуры */
 .keypad {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(5, 1fr); /* Пять одинаковых по высоте рядов кнопок */
-    gap: 12px;
-    height: 60vh; /* Клавиатура занимает стабильные 60% высоты экрана */
-    min-height: 340px;
+    grid-template-rows: repeat(5, 1fr);
+    gap: 14px; /* Пропорциональные отступы между кнопками */
+    height: 65vh; /* Стабильные 65% от высоты экрана телефона */
+    width: 100%;
 }
 
-/* Базовый стиль кнопок */
+/* Кнопки */
 .btn {
     border: none;
     outline: none;
@@ -115,17 +115,17 @@ body {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    font-family: 'Google Sans', sans-serif; /* Для Expressive стиля используем Google Sans и на кнопках */
-    transition: transform 0.08s cubic-bezier(0.2, 0, 0, 1), filter 0.15s ease;
+    font-family: 'Google Sans', sans-serif;
+    transition: transform 0.05s ease, filter 0.1s ease;
 }
 
-/* Плавный M3 тач-эффект */
+/* Эффект клика */
 .btn:active {
-    transform: scale(0.95);
-    filter: brightness(0.88);
+    transform: scale(0.93);
+    filter: brightness(0.85);
 }
 
-/* Стилизация категорий кнопок согласно иерархии цветов M3 */
+/* Цвета по гайдлайнам Material 3 */
 .btn-number {
     background-color: var(--md-sys-color-surface-container);
     color: var(--md-sys-color-on-surface);
@@ -135,8 +135,8 @@ body {
 .btn-operator {
     background-color: var(--md-sys-color-primary-container);
     color: var(--md-sys-color-on-primary-container);
-    border-radius: var(--md-sys-shape-corner-full); /* Операторы круглые */
-    font-size: 1.9rem;
+    border-radius: var(--md-sys-shape-corner-full); /* Операторы круглые/таблетки */
+    font-size: 1.8rem;
 }
 
 .btn-action {
@@ -151,9 +151,10 @@ body {
     border-radius: var(--md-sys-shape-corner-full);
 }
 
+/* Кнопка 0 */
 .btn-zero {
     grid-column: span 2;
     justify-content: flex-start;
-    padding-left: 32px;
+    padding-left: 36px;
     border-radius: var(--md-sys-shape-corner-expressive-btn);
 }
