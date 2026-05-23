@@ -2,27 +2,27 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M3 Expressive Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>M3 Expressive Fullscreen Calculator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="calculator">
-        <!-- Экран вывода -->
+    <div class="calculator-fullscreen">
+        <!-- Адаптивный Fullscreen Экран вывода -->
         <div class="display">
             <div class="previous-operand" id="previous"></div>
             <div class="current-operand" id="current">0</div>
         </div>
 
-        <!-- Клавиатура -->
+        <!-- Полноэкранная Клавиатура -->
         <div class="keypad">
-            <!-- Верхний ряд: Действия -->
+            <!-- Верхний ряд действий -->
             <button class="btn btn-action" data-action="clear">AC</button>
             <button class="btn btn-action" data-action="delete">⌫</button>
             <button class="btn btn-operator" data-action="operator">%</button>
             <button class="btn btn-operator" data-action="operator">÷</button>
 
-            <!-- Цифры и базовые операции -->
+            <!-- Основной блок -->
             <button class="btn btn-number" data-action="number">7</button>
             <button class="btn btn-number" data-action="number">8</button>
             <button class="btn btn-number" data-action="number">9</button>
