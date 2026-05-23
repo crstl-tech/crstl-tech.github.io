@@ -1,160 +1,473 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+/* ============================================================
+   Material 3 Expressive — Calculator
+   Token-based design system (m3.material.io)
+   ============================================================ */
 
-/* Подключаем правильный Google Sans */
-@font-face {
-    font-family: 'Google Sans';
-    font-style: normal;
-    font-weight: 400;
-    src: local('Google Sans Regular'), local('Google Sans-Regular'), url(https://fonts.gstatic.com/s/googlesans/v14/4UaGrENHsxJLGDuGo1OIlL3Kwp5MKg.woff2) format('woff2');
-}
-@font-face {
-    font-family: 'Google Sans';
-    font-style: normal;
-    font-weight: 500;
-    src: local('Google Sans Medium'), local('Google Sans-Medium'), url(https://fonts.gstatic.com/s/googlesans/v14/4UabrENHsxJLGDuGo1OIlLU94YtzCwZ-Pw.woff2) format('woff2');
-}
-
+/* ── 1. DESIGN TOKENS ─────────────────────────────────────── */
 :root {
-    /* M3 Светлая тема */
-    --md-sys-color-background: #FDFBFF;
-    --md-sys-color-surface: #FDFBFF;
-    --md-sys-color-surface-container: #F3F3FA;
-    --md-sys-color-on-surface: #1A1B1F;
-    --md-sys-color-on-surface-variant: #44464F;
-    
-    --md-sys-color-primary: #005AC1;
-    --md-sys-color-on-primary: #FFFFFF;
-    --md-sys-color-primary-container: #D8E2FF;
-    --md-sys-color-on-primary-container: #001A41;
-    
-    --md-sys-color-secondary-container: #E1E2EC;
-    --md-sys-color-on-secondary-container: #1A1B1F;
-    
-    --md-sys-color-tertiary-container: #FFD9E2;
-    --md-sys-color-on-tertiary-container: #31111D;
+  /* Primary palette */
+  --md-primary:             #6750A4;
+  --md-on-primary:          #FFFFFF;
+  --md-primary-container:   #EADDFF;
+  --md-on-primary-container:#21005D;
 
-    /* Скругления M3 Expressive */
-    --md-sys-shape-corner-full: 9999px;
-    --md-sys-shape-corner-expressive-btn: 28px; /* Выразительные скругленные квадраты */
+  /* Secondary */
+  --md-secondary:           #625B71;
+  --md-on-secondary:        #FFFFFF;
+  --md-secondary-container: #E8DEF8;
+  --md-on-secondary-container:#1D192B;
+
+  /* Tertiary */
+  --md-tertiary:            #7D5260;
+  --md-on-tertiary:         #FFFFFF;
+  --md-tertiary-container:  #FFD8E4;
+  --md-on-tertiary-container:#31111D;
+
+  /* Surface & Background */
+  --md-surface:             #FFFBFE;
+  --md-surface-variant:     #E7E0EC;
+  --md-on-surface:          #1C1B1F;
+  --md-on-surface-variant:  #49454F;
+
+  /* Outline */
+  --md-outline:             #79747E;
+  --md-outline-variant:     #CAC4D0;
+
+  /* Error */
+  --md-error:               #B3261E;
+  --md-on-error:            #FFFFFF;
+  --md-error-container:     #F9DEDC;
+
+  /* Inverse */
+  --md-inverse-surface:     #313033;
+  --md-inverse-on-surface:  #F4EFF4;
+
+  /* Elevation (surface tints) */
+  --md-surface-1: color-mix(in srgb, var(--md-primary) 5%,  var(--md-surface));
+  --md-surface-2: color-mix(in srgb, var(--md-primary) 8%,  var(--md-surface));
+  --md-surface-3: color-mix(in srgb, var(--md-primary) 11%, var(--md-surface));
+  --md-surface-4: color-mix(in srgb, var(--md-primary) 12%, var(--md-surface));
+  --md-surface-5: color-mix(in srgb, var(--md-primary) 14%, var(--md-surface));
+
+  /* Shape scale (M3 corner radii) */
+  --md-shape-xs:   4px;
+  --md-shape-sm:   8px;
+  --md-shape-md:   12px;
+  --md-shape-lg:   16px;
+  --md-shape-xl:   28px;
+  --md-shape-full: 9999px;
+
+  /* Motion (spring-inspired, M3 Expressive) */
+  --md-motion-standard:    cubic-bezier(0.2, 0, 0, 1);
+  --md-motion-emphasized:  cubic-bezier(0.05, 0.7, 0.1, 1);
+  --md-motion-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);
+  --md-duration-short:     150ms;
+  --md-duration-medium:    300ms;
+  --md-duration-long:      500ms;
+
+  /* Typography — Roboto Flex / Google Sans */
+  --md-font-display:  'Google Sans Display', 'Roboto Flex', sans-serif;
+  --md-font-body:     'Google Sans', 'Roboto Flex', sans-serif;
+
+  /* Spacing */
+  --calc-padding: 20px;
+  --key-gap:      10px;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
+/* ── 2. DARK THEME TOKENS ─────────────────────────────────── */
+[data-theme="dark"] {
+  --md-primary:             #D0BCFF;
+  --md-on-primary:          #381E72;
+  --md-primary-container:   #4F378B;
+  --md-on-primary-container:#EADDFF;
+
+  --md-secondary:           #CCC2DC;
+  --md-on-secondary:        #332D41;
+  --md-secondary-container: #4A4458;
+  --md-on-secondary-container:#E8DEF8;
+
+  --md-tertiary:            #EFB8C8;
+  --md-on-tertiary:         #492532;
+  --md-tertiary-container:  #633B48;
+  --md-on-tertiary-container:#FFD8E4;
+
+  --md-surface:             #1C1B1F;
+  --md-surface-variant:     #49454F;
+  --md-on-surface:          #E6E1E5;
+  --md-on-surface-variant:  #CAC4D0;
+
+  --md-outline:             #938F99;
+  --md-outline-variant:     #49454F;
+
+  --md-error:               #F2B8B5;
+  --md-on-error:            #601410;
+  --md-error-container:     #8C1D18;
+
+  --md-inverse-surface:     #E6E1E5;
+  --md-inverse-on-surface:  #313033;
+
+  --md-surface-1: color-mix(in srgb, var(--md-primary) 5%,  var(--md-surface));
+  --md-surface-2: color-mix(in srgb, var(--md-primary) 8%,  var(--md-surface));
+  --md-surface-3: color-mix(in srgb, var(--md-primary) 11%, var(--md-surface));
+  --md-surface-4: color-mix(in srgb, var(--md-primary) 12%, var(--md-surface));
+  --md-surface-5: color-mix(in srgb, var(--md-primary) 14%, var(--md-surface));
+}
+
+/* ── 3. RESET & BASE ──────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-    background-color: var(--md-sys-color-background);
-    font-family: 'Roboto', sans-serif;
-    height: 100vh;
-    height: 100dvh; /* Для мобильных браузеров, чтобы не скрывалось за панелями */
-    width: 100vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  background-color: var(--md-surface);
+  color: var(--md-on-surface);
+  font-family: var(--md-font-body);
+  transition:
+    background-color var(--md-duration-medium) var(--md-motion-standard),
+    color            var(--md-duration-medium) var(--md-motion-standard);
+  overflow: hidden;
 }
 
-/* Контейнер теперь растягивается на 100% ширины телефона */
-.calculator-fullscreen {
-    width: 100%;
-    height: 100%;
-    max-width: 480px; /* Ограничение для десктопов, на мобильном будет во весь экран */
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    gap: 16px;
+/* ── 4. DECORATIVE BACKGROUND SCRIM ──────────────────────── */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 20% 10%,
+      color-mix(in srgb, var(--md-primary) 18%, transparent) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 60% 70% at 85% 90%,
+      color-mix(in srgb, var(--md-tertiary) 14%, transparent) 0%,
+      transparent 60%
+    );
+  pointer-events: none;
+  transition: all var(--md-duration-long) var(--md-motion-emphasized);
 }
 
-/* Зона дисплея */
+/* ── 5. LAYOUT WRAPPER ────────────────────────────────────── */
+.calc-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* ── 6. CALCULATOR CARD (Surface level 2) ─────────────────── */
+.calc-card {
+  width: 360px;
+  background: var(--md-surface-2);
+  border-radius: var(--md-shape-xl);
+  overflow: hidden;
+  box-shadow:
+    0px 1px 2px  rgba(0,0,0,.06),
+    0px 4px 12px rgba(0,0,0,.08),
+    0px 12px 40px rgba(0,0,0,.10);
+  transition:
+    background var(--md-duration-medium) var(--md-motion-standard),
+    box-shadow  var(--md-duration-medium) var(--md-motion-standard);
+}
+
+/* ── 7. DISPLAY PANEL ─────────────────────────────────────── */
 .display {
-    flex: 1; /* Занимает всю верхнюю часть */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: flex-end;
-    padding: 24px 12px;
+  background: var(--md-surface-3);
+  padding: 28px var(--calc-padding) 22px;
+  min-height: 148px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 4px;
+  border-bottom: 1px solid var(--md-outline-variant);
+  transition: background var(--md-duration-medium) var(--md-motion-standard);
 }
 
-.previous-operand {
-    font-family: 'Google Sans', sans-serif;
-    font-size: 1.4rem;
-    color: var(--md-sys-color-on-surface-variant);
-    opacity: 0.7;
-    min-height: 1.8rem;
+.display__expression {
+  font-family: var(--md-font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--md-on-surface-variant);
+  min-height: 1.4rem;
+  text-align: right;
+  word-break: break-all;
+  transition: color var(--md-duration-short) var(--md-motion-standard);
+  letter-spacing: 0.01em;
 }
 
-.current-operand {
-    font-family: 'Google Sans', sans-serif;
-    font-size: clamp(3rem, 10vh, 5.5rem); /* Авто-подбор размера под экран */
-    font-weight: 400;
-    color: var(--md-sys-color-on-surface);
-    line-height: 1.1;
-    word-break: break-all;
+.display__result {
+  font-family: var(--md-font-display);
+  font-size: clamp(2.2rem, 10vw, 3.5rem);
+  font-weight: 400;
+  color: var(--md-on-surface);
+  text-align: right;
+  word-break: break-all;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  transition:
+    color     var(--md-duration-short) var(--md-motion-standard),
+    font-size var(--md-duration-short) var(--md-motion-standard),
+    transform var(--md-duration-short) var(--md-motion-spring);
+  transform-origin: right center;
 }
 
-/* Исправленная сетка клавиатуры */
+.display__result.shrink {
+  font-size: clamp(1.6rem, 7vw, 2.4rem);
+}
+
+/* ── 8. KEYPAD GRID ───────────────────────────────────────── */
 .keypad {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    gap: 14px; /* Пропорциональные отступы между кнопками */
-    height: 65vh; /* Стабильные 65% от высоты экрана телефона */
-    width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--key-gap);
+  padding: var(--calc-padding);
+  background: var(--md-surface-2);
+  transition: background var(--md-duration-medium) var(--md-motion-standard);
 }
 
-/* Кнопки */
-.btn {
-    border: none;
-    outline: none;
+/* ── 9. KEYS — BASE ───────────────────────────────────────── */
+.key {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 68px;
+  border: none;
+  border-radius: var(--md-shape-full);
+  font-family: var(--md-font-body);
+  font-size: 1.5rem;
+  font-weight: 400;
+  cursor: pointer;
+  outline: none;
+  overflow: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  /* M3 state layer via pseudo-element */
+  transition:
+    background-color var(--md-duration-short) var(--md-motion-standard),
+    color            var(--md-duration-short) var(--md-motion-standard),
+    transform        var(--md-duration-short) var(--md-motion-spring),
+    box-shadow       var(--md-duration-short) var(--md-motion-standard);
+}
+
+/* State layer */
+.key::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity var(--md-duration-short) var(--md-motion-standard);
+  pointer-events: none;
+}
+
+/* Ripple pseudo-element */
+.key::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.15;
+  transform: translate(-50%, -50%);
+  transition: width 0s, height 0s, opacity var(--md-duration-medium) ease;
+  pointer-events: none;
+}
+
+.key.ripple::after {
+  width: 200px;
+  height: 200px;
+  opacity: 0;
+  transition:
+    width  var(--md-duration-medium) var(--md-motion-standard),
+    height var(--md-duration-medium) var(--md-motion-standard),
+    opacity var(--md-duration-long)   ease;
+}
+
+/* Hover state */
+.key:hover::before { opacity: 0.08; }
+
+/* Focus-visible state */
+.key:focus-visible {
+  outline: 3px solid var(--md-primary);
+  outline-offset: 2px;
+}
+.key:focus-visible::before { opacity: 0.12; }
+
+/* Pressed state */
+.key:active {
+  transform: scale(0.93);
+}
+.key:active::before { opacity: 0.16; }
+
+/* ── 10. KEY VARIANTS ─────────────────────────────────────── */
+
+/* Digit keys — Surface Variant (tonal surface) */
+.key--digit {
+  background-color: var(--md-surface-5);
+  color: var(--md-on-surface);
+}
+
+/* Function keys (AC, +/−, %) — Secondary Container */
+.key--function {
+  background-color: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+  font-weight: 500;
+}
+
+/* Operator keys (÷ × − +) — Primary */
+.key--operator {
+  background-color: var(--md-primary);
+  color: var(--md-on-primary);
+  font-weight: 500;
+  font-size: 1.6rem;
+}
+
+/* Operator: active/selected state */
+.key--operator.active {
+  background-color: var(--md-on-primary);
+  color: var(--md-primary);
+  box-shadow: 0 0 0 2px var(--md-primary);
+}
+
+/* Equals key — Primary Container (large, emphasis) */
+.key--equals {
+  background-color: var(--md-tertiary-container);
+  color: var(--md-on-tertiary-container);
+  font-size: 1.8rem;
+  font-weight: 500;
+}
+
+.key--equals:hover::before { opacity: 0.10; }
+
+/* Wide key (0 — spans 2 columns) */
+.key--wide {
+  grid-column: span 2;
+  justify-content: flex-start;
+  padding-left: 28px;
+}
+
+/* ── 11. THEME FAB ────────────────────────────────────────── */
+.theme-fab {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--md-shape-lg);
+  border: none;
+  background-color: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.08),
+    0 4px 12px rgba(0,0,0,.12);
+  transition:
+    background-color var(--md-duration-medium) var(--md-motion-standard),
+    box-shadow       var(--md-duration-short)  var(--md-motion-standard),
+    transform        var(--md-duration-short)  var(--md-motion-spring);
+  overflow: hidden;
+}
+
+.theme-fab:hover {
+  box-shadow:
+    0 2px 4px rgba(0,0,0,.10),
+    0 8px 20px rgba(0,0,0,.16);
+}
+
+.theme-fab:active {
+  transform: scale(0.92);
+  box-shadow: 0 1px 3px rgba(0,0,0,.10);
+}
+
+.theme-fab:focus-visible {
+  outline: 3px solid var(--md-primary);
+  outline-offset: 2px;
+}
+
+.theme-icon {
+  display: block;
+  transition: transform var(--md-duration-medium) var(--md-motion-spring);
+}
+
+/* ── 12. RESULT ANIMATION ─────────────────────────────────── */
+@keyframes resultPop {
+  0%   { transform: scale(0.96); opacity: 0.6; }
+  60%  { transform: scale(1.03); }
+  100% { transform: scale(1);    opacity: 1;   }
+}
+
+.display__result.pop {
+  animation: resultPop var(--md-duration-medium) var(--md-motion-spring) both;
+}
+
+/* ── 13. ERROR STATE ──────────────────────────────────────── */
+.display__result.error {
+  color: var(--md-error);
+  font-size: 1.8rem;
+}
+
+/* ── 14. SCROLLBAR (for long expression) ─────────────────── */
+.display__expression {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* ── 15. RESPONSIVE ───────────────────────────────────────── */
+@media (max-width: 400px) {
+  .calc-card {
+    width: calc(100vw - 32px);
+  }
+  .key {
+    height: 60px;
+    font-size: 1.3rem;
+  }
+  .key--operator {
+    font-size: 1.45rem;
+  }
+  .key--equals {
     font-size: 1.6rem;
-    font-weight: 500;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    font-family: 'Google Sans', sans-serif;
-    transition: transform 0.05s ease, filter 0.1s ease;
+  }
+  :root {
+    --calc-padding: 14px;
+    --key-gap: 8px;
+  }
 }
 
-/* Эффект клика */
-.btn:active {
-    transform: scale(0.93);
-    filter: brightness(0.85);
+@media (min-width: 600px) {
+  .calc-card {
+    width: 380px;
+  }
 }
 
-/* Цвета по гайдлайнам Material 3 */
-.btn-number {
-    background-color: var(--md-sys-color-surface-container);
-    color: var(--md-sys-color-on-surface);
-    border-radius: var(--md-sys-shape-corner-expressive-btn);
-}
-
-.btn-operator {
-    background-color: var(--md-sys-color-primary-container);
-    color: var(--md-sys-color-on-primary-container);
-    border-radius: var(--md-sys-shape-corner-full); /* Операторы круглые/таблетки */
-    font-size: 1.8rem;
-}
-
-.btn-action {
-    background-color: var(--md-sys-color-tertiary-container);
-    color: var(--md-sys-color-on-tertiary-container);
-    border-radius: var(--md-sys-shape-corner-full);
-}
-
-.btn-equals {
-    background-color: var(--md-sys-color-primary);
-    color: var(--md-sys-color-on-primary);
-    border-radius: var(--md-sys-shape-corner-full);
-}
-
-/* Кнопка 0 */
-.btn-zero {
-    grid-column: span 2;
-    justify-content: flex-start;
-    padding-left: 36px;
-    border-radius: var(--md-sys-shape-corner-expressive-btn);
+/* ── 16. REDUCED MOTION ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
 }
