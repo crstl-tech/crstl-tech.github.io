@@ -18,9 +18,7 @@ class Calculator {
     }
 
     appendNumber(number) {
-        // Меняем визуальную запятую на программную точку
         const strNum = number === ',' ? '.' : number;
-        
         if (strNum === '.' && this.currentOperand.includes('.')) return;
         
         if (this.currentOperand === '0' && strNum !== '.') {
@@ -44,39 +42,33 @@ class Calculator {
         let computation;
         const prev = parseFloat(this.previousOperand);
         const current = parseFloat(this.currentOperand);
-        
         if (isNaN(prev) || isNaN(current)) return;
 
         switch (this.operation) {
-            case '+':
-                computation = prev + current;
+            case '+': computation = prev + current; break;
+            case '−': computation = prev - current; break;
+            case '×': computation = prev * current; break;
+            case '÷': 
+                if (current === 0) {
+                    this.currentOperand = 'Ошибка';
+                    this.operation = undefined;
+                    this.previousOperand = '';
+                    return;
+                }
+                computation = prev / current; 
                 break;
-            case '−':
-                computation = prev - current;
-                break;
-            case '×':
-                computation = prev * current;
-                break;
-            case '÷':
-                computation = prev / current;
-                break;
-            case '%':
-                computation = prev % current;
-                break;
-            default:
-                return;
+            case '%': computation = prev % current; break;
+            default: return;
         }
         
-        // Ограничиваем длину десятичной дроби, чтобы не ломать дизайн
-        this.currentOperand = Math.round(computation * 100000000) / 100000000;
+        // Предотвращаем бесконечные дроби в JS (0.1 + 0.2)
+        this.currentOperand = parseFloat(computation.toFixed(8)).toString();
         this.operation = undefined;
         this.previousOperand = '';
     }
 
     updateDisplay() {
-        // Возвращаем точку на запятую для русского интерфейса
         this.currentTextElement.innerText = this.currentOperand.toString().replace('.', ',');
-        
         if (this.operation != null) {
             this.previousTextElement.innerText = 
                 `${this.previousOperand.toString().replace('.', ',')} ${this.operation}`;
@@ -98,24 +90,20 @@ document.querySelectorAll('.btn').forEach(button => {
         switch (action) {
             case 'number':
                 calculator.appendNumber(value);
-                calculator.updateDisplay();
                 break;
             case 'operator':
                 calculator.chooseOperation(value);
-                calculator.updateDisplay();
                 break;
             case 'clear':
                 calculator.clear();
-                calculator.updateDisplay();
                 break;
             case 'delete':
                 calculator.delete();
-                calculator.updateDisplay();
                 break;
             case 'equals':
                 calculator.compute();
-                calculator.updateDisplay();
                 break;
         }
+        calculator.updateDisplay();
     });
 });
