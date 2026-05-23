@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=Roboto:wght@400;500&display=swap');
+
+:root {
+    /* Токены Material 3 Light Theme */
+    --md-sys-color-background: #FDFBFF;
+    --md-sys-color-surface: #FDFBFF;
+    --md-sys-color-surface-variant: #E1E2EC;
+    --md-sys-color-on-surface: #1A1B1F;
+    
+    --md-sys-color-primary: #005AC1;
+    --md-sys-color-on-primary: #FFFFFF;
+    
+    --md-sys-color-primary-container: #D8E2FF;
+    --md-sys-color-on-primary-container: #001A41;
+    
+    --md-sys-color-secondary-container: #DDE2EA;
+    --md-sys-color-on-secondary-container: #111C2B;
+    
+    --md-sys-color-tertiary-container: #FFD9E2;
+    --md-sys-color-on-tertiary-container: #31111D;
+
+    /* Токены форм (Shape) */
+    --md-sys-shape-corner-extra-large: 28px;
+    --md-sys-shape-corner-full: 9999px;
+    --md-sys-shape-corner-medium: 16px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--md-sys-color-surface-variant); /* Выступает как фон вне калькулятора */
+    font-family: 'Roboto', sans-serif;
+    user-select: none;
+}
+
+.calculator {
+    background-color: var(--md-sys-color-surface);
+    width: 320px;
+    border-radius: var(--md-sys-shape-corner-extra-large);
+    padding: 24px;
+    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.08); /* Легкая M3 Elevation тень */
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.display {
+    background-color: var(--md-sys-color-surface-variant);
+    border-radius: var(--md-sys-shape-corner-extra-large);
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.previous-operand {
+    font-size: 1.2rem;
+    color: rgba(26, 27, 31, 0.6); /* Полупрозрачный текст для истории */
+    min-height: 24px;
+    font-family: 'Outfit', sans-serif;
+}
+
+.current-operand {
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: var(--md-sys-color-on-surface);
+    font-family: 'Outfit', sans-serif;
+    word-wrap: break-word;
+    max-width: 100%;
+    line-height: 1;
+}
+
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.btn {
+    border: none;
+    outline: none;
+    height: 64px;
+    font-size: 1.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.1s ease, filter 0.2s ease;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Эффект нажатия (имитация Ripple) */
+.btn:active {
+    transform: scale(0.92);
+    filter: brightness(0.9);
+}
+
+/* Цифры */
+.btn-number {
+    background-color: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+    border-radius: var(--md-sys-shape-corner-medium); /* Мягкий квадрат */
+}
+
+/* Операторы (+, -, *, /) */
+.btn-operator {
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+    font-size: 1.8rem;
+    border-radius: var(--md-sys-shape-corner-full); /* Круглая форма */
+}
+
+/* Действия (AC, Delete) */
+.btn-action {
+    background-color: var(--md-sys-color-tertiary-container);
+    color: var(--md-sys-color-on-tertiary-container);
+    border-radius: var(--md-sys-shape-corner-full);
+}
+
+/* Кнопка Равно */
+.btn-equals {
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    border-radius: var(--md-sys-shape-corner-full);
+}
+
+/* Ноль занимает две колонки */
+.btn-zero {
+    grid-column: span 2;
+    text-align: left;
+    padding-left: 28px;
+}
