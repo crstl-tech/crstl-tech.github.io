@@ -1,140 +1,159 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=Roboto:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+
+/* Подключаем Google Sans (в веб-среде его аналог Product Sans / Google Sans Display) */
+@font-face {
+    font-family: 'Google Sans';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Google Sans Regular'), local('Google Sans-Regular'), url(https://fonts.gstatic.com/s/googlesans/v14/4UaGrENHsxJLGDuGo1OIlL3Kwp5MKg.woff2) format('woff2');
+}
+@font-face {
+    font-family: 'Google Sans';
+    font-style: normal;
+    font-weight: 500;
+    src: local('Google Sans Medium'), local('Google Sans-Medium'), url(https://fonts.gstatic.com/s/googlesans/v14/4UabrENHsxJLGDuGo1OIlLU94YtzCwZ-Pw.woff2) format('woff2');
+}
 
 :root {
-    /* Токены Material 3 Light Theme */
+    /* M3 Тональная палитра (Светлая тема) */
     --md-sys-color-background: #FDFBFF;
     --md-sys-color-surface: #FDFBFF;
-    --md-sys-color-surface-variant: #E1E2EC;
+    --md-sys-color-surface-container: #F3F3FA;
     --md-sys-color-on-surface: #1A1B1F;
+    --md-sys-color-on-surface-variant: #44464F;
     
     --md-sys-color-primary: #005AC1;
     --md-sys-color-on-primary: #FFFFFF;
-    
     --md-sys-color-primary-container: #D8E2FF;
     --md-sys-color-on-primary-container: #001A41;
     
-    --md-sys-color-secondary-container: #DDE2EA;
-    --md-sys-color-on-secondary-container: #111C2B;
+    --md-sys-color-secondary-container: #E1E2EC;
+    --md-sys-color-on-secondary-container: #1A1B1F;
     
     --md-sys-color-tertiary-container: #FFD9E2;
     --md-sys-color-on-tertiary-container: #31111D;
 
-    /* Токены форм (Shape) */
-    --md-sys-shape-corner-extra-large: 28px;
+    /* Скругления M3 Expressive */
     --md-sys-shape-corner-full: 9999px;
-    --md-sys-shape-corner-medium: 16px;
+    --md-sys-shape-corner-expressive-btn: 24px; /* Фирменный сквиркл-эффект */
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: var(--md-sys-color-surface-variant); /* Выступает как фон вне калькулятора */
+    background-color: var(--md-sys-color-background);
     font-family: 'Roboto', sans-serif;
-    user-select: none;
-}
-
-.calculator {
-    background-color: var(--md-sys-color-surface);
-    width: 320px;
-    border-radius: var(--md-sys-shape-corner-extra-large);
-    padding: 24px;
-    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.08); /* Легкая M3 Elevation тень */
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.display {
-    background-color: var(--md-sys-color-surface-variant);
-    border-radius: var(--md-sys-shape-corner-extra-large);
-    padding: 32px 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
+    height: 100vh;
+    height: 100dvh; /* Поддержка динамической высоты на мобильных */
     overflow: hidden;
+    display: flex;
 }
 
-.previous-operand {
-    font-size: 1.2rem;
-    color: rgba(26, 27, 31, 0.6); /* Полупрозрачный текст для истории */
-    min-height: 24px;
-    font-family: 'Outfit', sans-serif;
+.calculator-fullscreen {
+    width: 100vw;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    gap: 16px;
+    max-width: 600px; /* Ограничение для десктопов, чтобы калькулятор не растягивался слишком сильно */
+    margin: 0 auto;
 }
 
-.current-operand {
-    font-size: 3.5rem;
-    font-weight: 300;
-    color: var(--md-sys-color-on-surface);
-    font-family: 'Outfit', sans-serif;
-    word-wrap: break-word;
-    max-width: 100%;
-    line-height: 1;
-}
-
-.keypad {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+/* Верхний экран */
+.display {
+    flex: 1; /* Занимает всё свободное место сверху */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Текст прижимается к кнопкам */
+    align-items: flex-end;
+    padding: 16px 8px;
     gap: 12px;
 }
 
+.previous-operand {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 1.5rem;
+    color: var(--md-sys-color-on-surface-variant);
+    opacity: 0.7;
+    min-height: 2rem;
+    letter-spacing: 0px;
+}
+
+.current-operand {
+    font-family: 'Google Sans', sans-serif;
+    font-size: clamp(3rem, 12vh, 5rem); /* Размер адаптивно подстраивается под высоту экрана */
+    font-weight: 400;
+    color: var(--md-sys-color-on-surface);
+    line-height: 1.1;
+    word-break: break-all;
+    text-align: right;
+}
+
+/* Сетка клавиатуры */
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(5, 1fr); /* Пять одинаковых по высоте рядов кнопок */
+    gap: 12px;
+    height: 60vh; /* Клавиатура занимает стабильные 60% высоты экрана */
+    min-height: 340px;
+}
+
+/* Базовый стиль кнопок */
 .btn {
     border: none;
     outline: none;
-    height: 64px;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     font-weight: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
-    transition: transform 0.1s ease, filter 0.2s ease;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Google Sans', sans-serif; /* Для Expressive стиля используем Google Sans и на кнопках */
+    transition: transform 0.08s cubic-bezier(0.2, 0, 0, 1), filter 0.15s ease;
 }
 
-/* Эффект нажатия (имитация Ripple) */
+/* Плавный M3 тач-эффект */
 .btn:active {
-    transform: scale(0.92);
-    filter: brightness(0.9);
+    transform: scale(0.95);
+    filter: brightness(0.88);
 }
 
-/* Цифры */
+/* Стилизация категорий кнопок согласно иерархии цветов M3 */
 .btn-number {
-    background-color: var(--md-sys-color-secondary-container);
-    color: var(--md-sys-color-on-secondary-container);
-    border-radius: var(--md-sys-shape-corner-medium); /* Мягкий квадрат */
+    background-color: var(--md-sys-color-surface-container);
+    color: var(--md-sys-color-on-surface);
+    border-radius: var(--md-sys-shape-corner-expressive-btn);
 }
 
-/* Операторы (+, -, *, /) */
 .btn-operator {
     background-color: var(--md-sys-color-primary-container);
     color: var(--md-sys-color-on-primary-container);
-    font-size: 1.8rem;
-    border-radius: var(--md-sys-shape-corner-full); /* Круглая форма */
+    border-radius: var(--md-sys-shape-corner-full); /* Операторы круглые */
+    font-size: 1.9rem;
 }
 
-/* Действия (AC, Delete) */
 .btn-action {
     background-color: var(--md-sys-color-tertiary-container);
     color: var(--md-sys-color-on-tertiary-container);
     border-radius: var(--md-sys-shape-corner-full);
 }
 
-/* Кнопка Равно */
 .btn-equals {
     background-color: var(--md-sys-color-primary);
     color: var(--md-sys-color-on-primary);
     border-radius: var(--md-sys-shape-corner-full);
 }
 
-/* Ноль занимает две колонки */
 .btn-zero {
     grid-column: span 2;
-    text-align: left;
-    padding-left: 28px;
+    justify-content: flex-start;
+    padding-left: 32px;
+    border-radius: var(--md-sys-shape-corner-expressive-btn);
 }
